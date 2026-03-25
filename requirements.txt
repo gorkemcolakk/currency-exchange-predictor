@@ -1,0 +1,7 @@
+Flask
+requests
+pandas
+prophet
+plotly
+yfinance
+holidays
