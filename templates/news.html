@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finansal Haberler | GOBA INVEST</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container nav-container">
+            <a href="/" class="nav-logo">
+                <div class="logo-symbol"><i class="fa-solid fa-chart-line"></i></div>
+                <span class="logo-text">GOBA<span>INVEST</span></span>
+            </a>
+            <nav style="display: flex; align-items: center;">
+                <a href="/"><i class="fa-solid fa-house"></i> Anasayfa</a>
+                <a href="/news" style="color: white;"><i class="fa-solid fa-newspaper"></i> Haberler</a>
+                <a href="/contact"><i class="fa-solid fa-envelope"></i> İletişim</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero">
+            <h1>Piyasa Gündemi</h1>
+            <p>Küresel piyasalardan en sıcak haberler, derinlemesine analizler ve döviz dünyasındaki kritik gelişmeler.</p>
+        </section>
+
+        <div class="bento-grid" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));">
+            <div class="glass-card news-card">
+                <span class="rate-badge rate-up" style="width: fit-content; margin-bottom: 1rem;">Analiz</span>
+                <h3>JP Morgan: Dolar 2025'te Zayıf Kalabilir</h3>
+                <p>Gelişmekte olan piyasalar için yeni fırsatlar doğuyor. Yatırımcılar doların değer kaybıyla birlikte risk iştahını artırabilir.</p>
+                <div class="card-footer" style="padding-top: 1rem;">
+                    <span>31 Mayıs 2025</span>
+                    <span style="color: var(--accent-secondary);">Devamını Oku <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.7rem;"></i></span>
+                </div>
+            </div>
+
+            <div class="glass-card news-card">
+                <span class="rate-badge rate-down" style="width: fit-content; margin-bottom: 1rem;">Ekonomi</span>
+                <h3>Euro Bölgesi: Enflasyon Yavaşlıyor</h3>
+                <p>ECB faiz artırımlarına ara verebilir mi? Bu gelişme Euro değerinde dalgalanmalara yol açabilir.</p>
+                <div class="card-footer" style="padding-top: 1rem;">
+                    <span>30 Mayıs 2025</span>
+                    <span style="color: var(--accent-secondary);">Devamını Oku <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.7rem;"></i></span>
+                </div>
+            </div>
+
+            <div class="glass-card news-card">
+                <span class="rate-badge rate-down" style="width: fit-content; margin-bottom: 1rem;">Rapor</span>
+                <h3>İngiltere'de İşsizlik Verileri Beklentileri Aştı</h3>
+                <p>İşgücü piyasasının zayıflamasıyla Sterlin (GBP) üzerindeki baskı artıyor. Ekonomistler temkinli.</p>
+                <div class="card-footer" style="padding-top: 1rem;">
+                    <span>29 Mayıs 2025</span>
+                    <span style="color: var(--accent-secondary);">Devamını Oku <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.7rem;"></i></span>
+                </div>
+            </div>
+
+            <div class="glass-card news-card">
+                <span class="rate-badge rate-up" style="width: fit-content; margin-bottom: 1rem;">Yerel</span>
+                <h3>Türkiye: Cari Açıkta Keskin Düşüş</h3>
+                <p>Cari açığın daralması Türk Lirası için pozitif bir sinyal olarak algılanıyor. Ekonomistler iyimser tarafta.</p>
+                <div class="card-footer" style="padding-top: 1rem;">
+                    <span>28 Mayıs 2025</span>
+                    <span style="color: var(--accent-secondary);">Devamını Oku <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.7rem;"></i></span>
+                </div>
+            </div>
+
+            <div class="glass-card news-card">
+                <span class="rate-badge rate-up" style="width: fit-content; margin-bottom: 1rem;">Global</span>
+                <h3>Eurozone Endüstriyel Üretim Verileri Güçlü</h3>
+                <p>Üretimdeki artış, Avrupa ekonomisinin toparlanma sürecinde olduğunu gösteriyor. Euro dirençli kalabilir.</p>
+                <div class="card-footer" style="padding-top: 1rem;">
+                    <span>24 Mayıs 2025</span>
+                    <span style="color: var(--accent-secondary);">Devamını Oku <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.7rem;"></i></span>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 4rem;">
+            <a href="/" class="btn btn-primary">Anasayfaya Dön</a>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 GOBA INVEST. Tüm Hakları Saklıdır.</p>
+    </footer>
+</body>
+</html>

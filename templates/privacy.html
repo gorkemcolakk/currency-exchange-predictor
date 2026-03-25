@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gizlilik Politikası | GOBA INVEST</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .privacy-content {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            backdrop-filter: var(--glass-blur);
+            border-radius: 24px;
+            padding: 4rem;
+            margin-top: 2rem;
+            text-align: left;
+        }
+        .privacy-content h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent-secondary);
+            border-bottom: 2px solid var(--accent-secondary);
+            padding-bottom: 0.5rem;
+            display: inline-block;
+        }
+        .privacy-content p {
+            margin-bottom: 2rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container nav-container">
+            <a href="/" class="nav-logo">
+                <div class="logo-symbol"><i class="fa-solid fa-chart-line"></i></div>
+                <span class="logo-text">GOBA<span>INVEST</span></span>
+            </a>
+            <nav style="display: flex; align-items: center;">
+                <a href="/"><i class="fa-solid fa-house"></i> Anasayfa</a>
+                <a href="/news"><i class="fa-solid fa-newspaper"></i> Haberler</a>
+                <a href="/contact"><i class="fa-solid fa-envelope"></i> İletişim</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero" style="padding-bottom: 2rem;">
+            <h1>Gizlilik Politikası</h1>
+            <p>Verileriniz ve yatırımcı haklarınız bizim için en yüksek önceliktir. Şeffaf ve güvenli bir platform için buradayız.</p>
+        </section>
+
+        <div class="privacy-content">
+            <h2>Hangi Bilgileri Topluyoruz?</h2>
+            <p>Sizden topladığımız bilgiler, sitemizdeki deneyiminizi kişiselleştirmek ve size daha iyi hizmet sunabilmek adına kullanılmaktadır. Topladığımız bilgiler arasında üyelik aşamasında alınan temel iletişim bilgileri ve sistem kullanımı sırasındaki tercihleriniz yer alır.</p>
+
+            <h2>Bilgilerin Kullanımı</h2>
+            <p>Topladığımız tüm bilgiler, yalnızca GOBA Invest üzerinden sunduğumuz hizmetlerin kalitesini artırmak, sizlere yeni özellikler hakkında bilgi vermek ve yasal yükümlülüklerimize uymak amacıyla kullanılmaktadır.</p>
+
+            <h2>Veri Güvenliği</h2>
+            <p>Verilerinizin güvenliği için en güncel şifreleme teknolojilerini ve güvenlik protokollerini kullanıyoruz. Bilgileriniz üçüncü taraflarla kesinlikle paylaşılmaz.</p>
+        </div>
+
+        <div style="text-align: center; margin-top: 4rem;">
+            <a href="/" class="btn btn-primary">Anasayfaya Dön</a>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 GOBA INVEST. Tüm Hakları Saklıdır.</p>
+    </footer>
+</body>
+</html>
