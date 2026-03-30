@@ -116,57 +116,63 @@ def train_and_forecast(currency_symbol, periods=730):
         csv_path = os.path.join(CACHE_DIR, f"{safe_name}_forecast.csv")
         result.to_csv(csv_path, index=False)
         
-        # Plotly Grafiği (Modern Stil)
-        fig = go.Figure()
+        # Plotly Grafiği (Modern Stil) - İki dilde de oluşturuyoruz
+        langs = {
+            'tr': {'actual': 'Gerçek Veri', 'forecast': 'Trend Tahmini', 'range': 'Tahmin Aralığı'},
+            'en': {'actual': 'Actual Data', 'forecast': 'Trend Forecast', 'range': 'Forecast Range'}
+        }
         
-        # Geçmiş Veri (Last 1 year for cleaner plot)
-        df_plot = df[df['ds'] > (datetime.now() - timedelta(days=365))]
-        fig.add_trace(go.Scatter(
-            x=df_plot['ds'], y=df_plot['y'],
-            name='Gerçek Veri',
-            line=dict(color='#3b82f6', width=2)
-        ))
-        
-        # Tahmin Verisi
-        fig.add_trace(go.Scatter(
-            x=result['ds'], y=result['yhat'],
-            name='Trend Tahmini',
-            line=dict(color='#10b981', width=3, dash='dash')
-        ))
-        
-        # Güven Aralığı (Defensive serialization for Pyre and JS)
-        x_fill = result['ds'].tolist() + result['ds'].tolist()[::-1]
-        y_fill = result['yhat_upper'].tolist() + result['yhat_lower'].tolist()[::-1]
-        
-        fig.add_trace(go.Scatter(
-            x=x_fill,
-            y=y_fill,
-            fill='toself',
-            fillcolor='rgba(16, 185, 129, 0.1)',
-            line=dict(color='rgba(255,255,255,0)'),
-            hoverinfo="skip",
-            showlegend=False,
-            name='Tahmin Aralığı'
-        ))
-        
-        fig.update_layout(
-            paper_bgcolor='rgba(0,0,0,0)',
-            plot_bgcolor='rgba(0,0,0,0)',
-            font=dict(color='#f8fafc', family='Inter'),
-            xaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)', zeroline=False),
-            yaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)', zeroline=False),
-            margin=dict(l=0, r=0, t=20, b=80),  # Legend için alt boşluk eklendi
-            legend=dict(
-                orientation="h",
-                yanchor="top",
-                y=-0.15,
-                xanchor="center",
-                x=0.5
+        for lang_code, labels in langs.items():
+            fig = go.Figure()
+            
+            # Geçmiş Veri (Last 1 year for cleaner plot)
+            df_plot = df[df['ds'] > (datetime.now() - timedelta(days=365))]
+            fig.add_trace(go.Scatter(
+                x=df_plot['ds'], y=df_plot['y'],
+                name=labels['actual'],
+                line=dict(color='#3b82f6', width=2)
+            ))
+            
+            # Tahmin Verisi
+            fig.add_trace(go.Scatter(
+                x=result['ds'], y=result['yhat'],
+                name=labels['forecast'],
+                line=dict(color='#10b981', width=3, dash='dash')
+            ))
+            
+            # Güven Aralığı
+            x_fill = result['ds'].tolist() + result['ds'].tolist()[::-1]
+            y_fill = result['yhat_upper'].tolist() + result['yhat_lower'].tolist()[::-1]
+            
+            fig.add_trace(go.Scatter(
+                x=x_fill,
+                y=y_fill,
+                fill='toself',
+                fillcolor='rgba(16, 185, 129, 0.1)',
+                line=dict(color='rgba(255,255,255,0)'),
+                hoverinfo="skip",
+                showlegend=False,
+                name=labels['range']
+            ))
+            
+            fig.update_layout(
+                paper_bgcolor='rgba(0,0,0,0)',
+                plot_bgcolor='rgba(0,0,0,0)',
+                font=dict(color='#f8fafc', family='Inter'),
+                xaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)', zeroline=False),
+                yaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)', zeroline=False),
+                margin=dict(l=0, r=0, t=20, b=80),
+                legend=dict(
+                    orientation="h",
+                    yanchor="top",
+                    y=-0.15,
+                    xanchor="center",
+                    x=0.5
+                )
             )
-        )
-        
-        plot_path = os.path.join(CACHE_DIR, f"{safe_name}_plot.html")
-        fig.write_html(plot_path, full_html=False, include_plotlyjs='cdn')
+            
+            plot_path = os.path.join(CACHE_DIR, f"{safe_name}_plot_{lang_code}.html")
+            fig.write_html(plot_path, full_html=False, include_plotlyjs='cdn')
         
         return result
     except Exception as e:
@@ -205,7 +211,7 @@ def currency_page(symbol):
             except:
                 data = None
             
-    if data is None:
+    if data is None or not os.path.exists(os.path.join(CACHE_DIR, f"{safe_name}_plot_tr.html")):
         data = train_and_forecast(symbol)
         if data is None:
              # Eğer download başarısız olduysa ama dosya varsa yine de eski dosyayı kullan
@@ -236,7 +242,8 @@ def currency_page(symbol):
         diffs = (data['ds'] - target_date).abs()
         idx = diffs.idxmin()
         val = float(data.loc[idx, 'yhat'])
-        date_str = data.loc[idx, 'ds'].strftime('%B %Y')
+        date_en = data.loc[idx, 'ds'].strftime('%B %Y')
+        date_tr = date_en
         # Türkçe ay isimleri için basit bir haritalama (Locale ile uğraşmamak için)
         months = {
             "January": "Ocak", "February": "Şubat", "March": "Mart", "April": "Nisan",
@@ -244,10 +251,10 @@ def currency_page(symbol):
             "September": "Eylül", "October": "Ekim", "November": "Kasım", "December": "Aralık"
         }
         for en, tr in months.items():
-            date_str = date_str.replace(en, tr)
+            date_tr = date_tr.replace(en, tr)
             
         change = ((val - current_rate) / current_rate) * 100 if current_rate != 0 else 0
-        return {"val": round(val, 4), "change": round(change, 2), "date": date_str}
+        return {"val": round(val, 4), "change": round(change, 2), "date_tr": date_tr, "date_en": date_en}
 
     forecasts = {
         "1w": get_forecast_val(7),
@@ -269,8 +276,9 @@ def currency_page(symbol):
     
     table_list = monthly_data
 
-    plot_file = f"cache/{safe_name}_plot.html"
-    plot_exists = os.path.exists(os.path.join(CACHE_DIR, f"{safe_name}_plot.html"))
+    plot_file_tr = f"cache/{safe_name}_plot_tr.html"
+    plot_file_en = f"cache/{safe_name}_plot_en.html"
+    plot_exists = os.path.exists(os.path.join(CACHE_DIR, f"{safe_name}_plot_tr.html"))
 
     return render_template('currency.html', 
                          info=info, 
@@ -280,8 +288,10 @@ def currency_page(symbol):
                          change_pct=f"{change_pct:+.2f}",
                          forecasts=forecasts,
                          table_list=table_list,
-                         plot_file=plot_file,
-                         plot_exists=plot_exists)
+                         plot_file_tr=plot_file_tr,
+                         plot_file_en=plot_file_en,
+                         plot_exists=plot_exists,
+                         update_time=current_item['update_time'] if current_item else datetime.now().strftime('%H:%M:%S'))
 
 @app.route('/api/rates')
 def api_rates():

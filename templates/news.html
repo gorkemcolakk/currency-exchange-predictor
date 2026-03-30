@@ -1,5 +1,13 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" data-theme="dark">
+<script>
+    (function() {
+        const theme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+        const lang = localStorage.getItem('lang') || 'tr';
+        document.documentElement.setAttribute('lang', lang);
+    })();
+</script>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,78 +23,184 @@
                 <span class="logo-text">GOBA<span>INVEST</span></span>
             </a>
             <nav style="display: flex; align-items: center;">
-                <a href="/"><i class="fa-solid fa-house"></i> Anasayfa</a>
-                <a href="/news" style="color: white;"><i class="fa-solid fa-newspaper"></i> Haberler</a>
-                <a href="/contact"><i class="fa-solid fa-envelope"></i> İletişim</a>
+                <a href="/" data-i18n="nav_home"><i class="fa-solid fa-house"></i> Anasayfa</a>
+                <a href="/news" class="nav-active" data-i18n="nav_news"><i class="fa-solid fa-newspaper"></i> Haberler</a>
+                <a href="/contact" data-i18n="nav_contact"><i class="fa-solid fa-envelope"></i> İletişim</a>
+                <div class="lang-switch" id="lang-toggle">
+                    <i class="fa-solid fa-globe"></i>
+                    <span id="lang-text">TR</span>
+                </div>
+                <div class="theme-switch" id="theme-toggle" title="Tema Değiştir">
+                    <i class="fa-solid fa-sun"></i>
+                    <i class="fa-solid fa-moon"></i>
+                </div>
+                <div class="clock-display" id="live-clock">
+                    <i class="fa-regular fa-clock"></i>
+                    <span>00:00:00</span>
+                </div>
             </nav>
         </div>
     </header>
 
     <main class="container">
         <section class="hero">
-            <h1>Piyasa Gündemi</h1>
-            <p>Küresel piyasalardan en sıcak haberler, derinlemesine analizler ve döviz dünyasındaki kritik gelişmeler.</p>
+            <h1 data-i18n="news_title">Piyasa Gündemi</h1>
+            <p data-i18n="news_subtitle">Küresel piyasalardan en sıcak haberler, derinlemesine analizler ve döviz dünyasındaki kritik gelişmeler.</p>
         </section>
 
         <div class="bento-grid" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));">
             <div class="glass-card news-card">
-                <span class="rate-badge rate-up" style="width: fit-content; margin-bottom: 1rem;">Analiz</span>
-                <h3>JP Morgan: Dolar 2025'te Zayıf Kalabilir</h3>
-                <p>Gelişmekte olan piyasalar için yeni fırsatlar doğuyor. Yatırımcılar doların değer kaybıyla birlikte risk iştahını artırabilir.</p>
+                <span class="rate-badge rate-up" style="width: fit-content; margin-bottom: 1rem;" data-i18n="tag_analysis">Analiz</span>
+                <h3 data-i18n="news_1_title">JP Morgan: Dolar 2025'te Zayıf Kalabilir</h3>
+                <p data-i18n="news_1_text">Gelişmekte olan piyasalar için yeni fırsatlar doğuyor. Yatırımcılar doların değer kaybıyla birlikte risk iştahını artırabilir.</p>
                 <div class="card-footer" style="padding-top: 1rem;">
                     <span>31 Mayıs 2025</span>
-                    <span style="color: var(--accent-secondary);">Devamını Oku <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.7rem;"></i></span>
+                    <span style="color: var(--accent-secondary);" data-i18n="news_read_more">Devamını Oku <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.7rem;"></i></span>
                 </div>
             </div>
 
             <div class="glass-card news-card">
-                <span class="rate-badge rate-down" style="width: fit-content; margin-bottom: 1rem;">Ekonomi</span>
-                <h3>Euro Bölgesi: Enflasyon Yavaşlıyor</h3>
-                <p>ECB faiz artırımlarına ara verebilir mi? Bu gelişme Euro değerinde dalgalanmalara yol açabilir.</p>
+                <span class="rate-badge rate-down" style="width: fit-content; margin-bottom: 1rem;" data-i18n="tag_economy">Ekonomi</span>
+                <h3 data-i18n="news_2_title">Euro Bölgesi: Enflasyon Yavaşlıyor</h3>
+                <p data-i18n="news_2_text">ECB faiz artırımlarına ara verebilir mi? Bu gelişme Euro değerinde dalgalanmalara yol açabilir.</p>
                 <div class="card-footer" style="padding-top: 1rem;">
                     <span>30 Mayıs 2025</span>
-                    <span style="color: var(--accent-secondary);">Devamını Oku <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.7rem;"></i></span>
+                    <span style="color: var(--accent-secondary);" data-i18n="news_read_more">Devamını Oku <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.7rem;"></i></span>
                 </div>
             </div>
 
             <div class="glass-card news-card">
-                <span class="rate-badge rate-down" style="width: fit-content; margin-bottom: 1rem;">Rapor</span>
-                <h3>İngiltere'de İşsizlik Verileri Beklentileri Aştı</h3>
-                <p>İşgücü piyasasının zayıflamasıyla Sterlin (GBP) üzerindeki baskı artıyor. Ekonomistler temkinli.</p>
+                <span class="rate-badge rate-down" style="width: fit-content; margin-bottom: 1rem;" data-i18n="tag_report">Rapor</span>
+                <h3 data-i18n="news_3_title">İngiltere'de İşsizlik Verileri Beklentileri Aştı</h3>
+                <p data-i18n="news_3_text">İşgücü piyasasının zayıflamasıyla Sterlin (GBP) üzerindeki baskı artıyor. Ekonomistler temkinli.</p>
                 <div class="card-footer" style="padding-top: 1rem;">
                     <span>29 Mayıs 2025</span>
-                    <span style="color: var(--accent-secondary);">Devamını Oku <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.7rem;"></i></span>
+                    <span style="color: var(--accent-secondary);" data-i18n="news_read_more">Devamını Oku <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.7rem;"></i></span>
                 </div>
             </div>
 
             <div class="glass-card news-card">
-                <span class="rate-badge rate-up" style="width: fit-content; margin-bottom: 1rem;">Yerel</span>
-                <h3>Türkiye: Cari Açıkta Keskin Düşüş</h3>
-                <p>Cari açığın daralması Türk Lirası için pozitif bir sinyal olarak algılanıyor. Ekonomistler iyimser tarafta.</p>
+                <span class="rate-badge rate-up" style="width: fit-content; margin-bottom: 1rem;" data-i18n="tag_local">Yerel</span>
+                <h3 data-i18n="news_4_title">Türkiye: Cari Açıkta Keskin Düşüş</h3>
+                <p data-i18n="news_4_text">Cari açığın daralması Türk Lirası için pozitif bir sinyal olarak algılanıyor. Ekonomistler iyimser tarafta.</p>
                 <div class="card-footer" style="padding-top: 1rem;">
                     <span>28 Mayıs 2025</span>
-                    <span style="color: var(--accent-secondary);">Devamını Oku <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.7rem;"></i></span>
+                    <span style="color: var(--accent-secondary);" data-i18n="news_read_more">Devamını Oku <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.7rem;"></i></span>
                 </div>
             </div>
 
             <div class="glass-card news-card">
-                <span class="rate-badge rate-up" style="width: fit-content; margin-bottom: 1rem;">Global</span>
-                <h3>Eurozone Endüstriyel Üretim Verileri Güçlü</h3>
-                <p>Üretimdeki artış, Avrupa ekonomisinin toparlanma sürecinde olduğunu gösteriyor. Euro dirençli kalabilir.</p>
+                <span class="rate-badge rate-up" style="width: fit-content; margin-bottom: 1rem;" data-i18n="tag_global">Global</span>
+                <h3 data-i18n="news_5_title">Eurozone Endüstriyel Üretim Verileri Güçlü</h3>
+                <p data-i18n="news_5_text">Üretimdeki artış, Avrupa ekonomisinin toparlanma sürecinde olduğunu gösteriyor. Euro dirençli kalabilir.</p>
                 <div class="card-footer" style="padding-top: 1rem;">
                     <span>24 Mayıs 2025</span>
-                    <span style="color: var(--accent-secondary);">Devamını Oku <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.7rem;"></i></span>
+                    <span style="color: var(--accent-secondary);" data-i18n="news_read_more">Devamını Oku <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.7rem;"></i></span>
                 </div>
             </div>
         </div>
 
         <div style="text-align: center; margin-top: 4rem;">
-            <a href="/" class="btn btn-primary">Anasayfaya Dön</a>
+            <a href="/" data-i18n="back_to_home" class="btn btn-primary">Anasayfaya Dön</a>
         </div>
     </main>
 
     <footer>
-        <p>&copy; 2024 GOBA INVEST. Tüm Hakları Saklıdır.</p>
+        <p data-i18n="footer_text">&copy; 2024 GOBA INVEST. Tüm Hakları Saklıdır.</p>
     </footer>
+    <script>
+        // Theme Toggle Logic
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+        // Language Logic
+        const translations = {
+            'tr': {
+                'nav_home': '<i class="fa-solid fa-house"></i> Anasayfa',
+                'nav_news': '<i class="fa-solid fa-newspaper"></i> Haberler',
+                'nav_contact': '<i class="fa-solid fa-envelope"></i> İletişim',
+                'news_title': 'Piyasa Gündemi',
+                'news_subtitle': 'Küresel piyasalardan en sıcak haberler, derinlemesine analizler ve döviz dünyasındaki kritik gelişmeler.',
+                'news_read_more': 'Devamını Oku <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.7rem;"></i>',
+                'tag_analysis': 'Analiz', 'tag_economy': 'Ekonomi', 'tag_report': 'Rapor', 'tag_local': 'Yerel', 'tag_global': 'Global',
+                'news_1_title': 'JP Morgan: Dolar 2025\'te Zayıf Kalabilir',
+                'news_1_text': 'Gelişmekte olan piyasalar için yeni fırsatlar doğuyor. Yatırımcılar doların değer kaybıyla birlikte risk iştahını artırabilir.',
+                'news_2_title': 'Euro Bölgesi: Enflasyon Yavaşlıyor',
+                'news_2_text': 'ECB faiz artırımlarına ara verebilir mi? Bu gelişme Euro değerinde dalgalanmalara yol açabilir.',
+                'news_3_title': 'İngiltere\'de İşsizlik Verileri Beklentileri Aştı',
+                'news_3_text': 'İşgücü piyasasının zayıflamasıyla Sterlin (GBP) üzerindeki baskı artıyor. Ekonomistler temkinli.',
+                'news_4_title': 'Türkiye: Cari Açıkta Keskin Düşüş',
+                'news_4_text': 'Cari açığın daralması Türk Lirası için pozitif bir sinyal olarak algılanıyor. Ekonomistler iyimser tarafta.',
+                'news_5_title': 'Eurozone Endüstriyel Üretim Verileri Güçlü',
+                'news_5_text': 'Üretimdeki artış, Avrupa ekonomisinin toparlanma sürecinde olduğunu gösteriyor. Euro dirençli kalabilir.',
+                'back_to_home': 'Anasayfaya Dön',
+                'footer_text': '&copy; 2024 GOBA INVEST. Tüm Hakları Saklıdır.'
+            },
+            'en': {
+                'nav_home': '<i class="fa-solid fa-house"></i> Home',
+                'nav_news': '<i class="fa-solid fa-newspaper"></i> News',
+                'nav_contact': '<i class="fa-solid fa-envelope"></i> Contact',
+                'news_title': 'Market Updates',
+                'news_subtitle': 'Latest news from global markets, in-depth analysis, and critical forex developments.',
+                'news_read_more': 'Read More <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.7rem;"></i>',
+                'tag_analysis': 'Analysis', 'tag_economy': 'Economy', 'tag_report': 'Report', 'tag_local': 'Local', 'tag_global': 'Global',
+                'news_1_title': 'JP Morgan: Dollar May Remain Weak in 2025',
+                'news_1_text': 'New opportunities are emerging for emerging markets. Investors may increase risk appetite as the dollar loses value.',
+                'news_2_title': 'Eurozone: Inflation Slowing Down',
+                'news_2_text': 'Could the ECB pause interest rate hikes? This development could lead to fluctuations in the value of the Euro.',
+                'news_3_title': 'UK Unemployment Data Exceeds Expectations',
+                'news_3_text': 'Pressure on the Sterling (GBP) is increasing as the labor market weakens. Economists are cautious.',
+                'news_4_title': 'Turkey: Sharp Decline in Current Account Deficit',
+                'news_4_text': 'The narrowing of the current account deficit is perceived as a positive signal for the Turkish Lira. Economists are on the optimistic side.',
+                'news_5_title': 'Eurozone Industrial Production Data Strong',
+                'news_5_text': 'The increase in production shows that the European economy is in a recovery process. The Euro could remain resilient.',
+                'back_to_home': 'Back to Home',
+                'footer_text': '&copy; 2024 GOBA INVEST. All Rights Reserved.'
+            }
+        };
+        const langToggle = document.getElementById('lang-toggle');
+        const langText = document.getElementById('lang-text');
+        function updateLanguage(lang) {
+            console.log("Updating language in News to:", lang);
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    el.innerHTML = translations[lang][key];
+                }
+            });
+            langText.innerText = lang.toUpperCase();
+            localStorage.setItem('lang', lang);
+            html.setAttribute('lang', lang);
+        }
+        langToggle.addEventListener('click', () => {
+            const currentLang = html.getAttribute('lang') || 'tr';
+            const newLang = currentLang === 'tr' ? 'en' : 'tr';
+            console.log("Switching language to:", newLang);
+            updateLanguage(newLang);
+        });
+
+        themeToggle.addEventListener('click', () => {
+            console.log("Theme click detected");
+            const currentTheme = html.getAttribute('data-theme') || 'dark';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            console.log("Switching theme to:", newTheme);
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+
+        const savedLang = localStorage.getItem('lang') || 'tr';
+        console.log("Initializing News Language:", savedLang);
+        updateLanguage(savedLang);
+
+        // Live Clock logic
+        function updateClock() {
+            const clockEl = document.querySelector('#live-clock span');
+            if (clockEl) {
+                const now = new Date();
+                clockEl.textContent = now.toLocaleTimeString('tr-TR', { hour12: false });
+            }
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+    </script>
 </body>
 </html>
