@@ -50,31 +50,86 @@
             <p data-i18n="hero_subtitle">Hatalara yer yok. En gelişmiş algoritmalarla döviz piyasasını 10 saniyede bir analiz ediyor, 2 yıllık projeksiyonlar sunuyoruz.</p>
         </section>
 
-        <h2 style="margin-bottom: 2rem; font-size: 1.5rem; letter-spacing: -0.5px; display: flex; align-items: center; gap: 10px;">
+        <!-- CANLI PİYASALAR TİCKER TABLOSU -->
+        <h2 style="margin-bottom: 1.5rem; font-size: 1.5rem; letter-spacing: -0.5px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
             <span data-i18n="live_markets_title">Canlı Piyasalar</span> 
             <span class="rate-badge rate-up" style="font-size: 0.7rem; padding: 4px 10px;">
                 <span class="live-dot" style="margin-right: 4px; background: #10b981;"></span> <span data-i18n="active_status">AKTİF</span>
             </span>
+            <span id="last-updated-badge" style="margin-left: auto; font-size: 1.05rem; font-weight: 500; color: var(--text-secondary); display: flex; align-items: center; gap: 6px;">
+                <i class="fa-regular fa-clock" style="font-size: 1.1rem;"></i>
+                <span data-i18n="last_updated_label">Son Güncelleme:</span>
+                <span id="last-updated-time" style="font-weight: 700; color: var(--accent-secondary);">--:--:--</span>
+            </span>
         </h2>
 
-        <section class="bento-grid">
+        <section class="ticker-table-section glass-card" style="padding: 0; margin-bottom: 3rem; overflow: hidden;">
+            <table class="ticker-table" id="ticker-table">
+                <thead>
+                    <tr>
+                        <th data-i18n="ticker_th_product">Ürün</th>
+                        <th data-i18n="ticker_th_price">Fiyat</th>
+                        <th data-i18n="ticker_th_change">Değişim</th>
+                        <th>%</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in ticker_data %}
+                    <tr id="ticker-{{ t.id }}">
+                        <td class="ticker-name">
+                            <i class="fa-solid {{ t.icon }}" style="width: 20px; text-align: center; {% if 'gold' in t.id or t.icon in ['fa-coins', 'fa-scale-balanced', 'fa-ring', 'fa-circle-half-stroke', 'fa-circle', 'fa-star'] %}color: #f59e0b;{% else %}color: var(--accent-secondary);{% endif %}"></i>
+                            <span>{{ t.name }}</span>
+                        </td>
+                        <td class="ticker-price" data-precision="{{ t.precision }}">{{ t.currency_symbol }}{{ ("%%.%df"|format(t.precision))|format(t.rate|float) }}</td>
+                        <td class="ticker-change {% if t.change|float >= 0 %}rate-up{% else %}rate-down{% endif %}">
+                            {% if t.change|float >= 0 %}+{% endif %}{{ "%.2f"|format(t.change|float) }}
+                        </td>
+                        <td class="ticker-pct {% if t.change_percent|float >= 0 %}rate-up{% else %}rate-down{% endif %}">
+                            <span class="ticker-dot {% if t.change_percent|float >= 0 %}dot-green{% else %}dot-red{% endif %}"></span>
+                            {% if t.change_percent|float >= 0 %}+{% endif %}{{ t.change_percent }}%
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+
+        <!-- DETAYLI ANALİZ KARTLARI -->
+        <h2 style="margin-bottom: 2rem; font-size: 1.5rem; letter-spacing: -0.5px; display: flex; align-items: center; gap: 10px;">
+            <i class="fa-solid fa-chart-line" style="color: var(--accent-secondary);"></i>
+            <span data-i18n="detailed_analysis">Detaylı Analiz</span>
+        </h2>
+
+        <section class="bento-grid analysis-grid">
             {% for item in forex_data %}
             <a href="/currency/{{ item.symbol }}" class="glass-card">
                 <div class="currency-header">
-                    <div class="currency-icon">
-                        <i class="fa-solid {% if item.symbol == 'USDTRY=X' %}fa-dollar-sign{% elif item.symbol == 'EURTRY=X' %}fa-euro-sign{% else %}fa-sterling-sign{% endif %}"></i>
+                <div class="currency-icon">
+                        {% if item.flag == 'gold_ons' %}
+                        <i class="fa-solid fa-coins" style="color: #f59e0b;"></i>
+                        {% elif item.flag == 'gold_gram' %}
+                        <i class="fa-solid fa-scale-balanced" style="color: #f59e0b;"></i>
+                        {% elif item.flag == 'silver' %}
+                        <i class="fa-solid fa-gem" style="color: #94a3b8;"></i>
+                        {% elif item.symbol == 'USDTRY=X' %}
+                        <i class="fa-solid fa-dollar-sign"></i>
+                        {% elif item.symbol == 'EURTRY=X' %}
+                        <i class="fa-solid fa-euro-sign"></i>
+                        {% else %}
+                        <i class="fa-solid fa-sterling-sign"></i>
+                        {% endif %}
                     </div>
                     <div class="currency-info">
                         <h3 data-i18n="name_{{ item.symbol }}">{{ item.name }}</h3>
-                        <span>{{ item.base }} / TRY</span>
+                        <span>{{ item.base }} / {{ item.quote }}</span>
                     </div>
                 </div>
                 
-                <div class="rate-value" id="rate-{{ item.symbol }}">{{ "%.4f"|format(item.rate|float) }}</div>
+                <div class="rate-value" id="rate-{{ item.symbol }}">{{ ("%%.%df"|format(item.precision))|format(item.rate|float) }}</div>
                 
                 <div>
                     <span class="rate-badge {% if item.change|float >= 0 %}rate-up{% else %}rate-down{% endif %}" id="badge-{{ item.symbol }}">
-                        {% if item.change|float >= 0 %}+{% endif %}{{ "%.4f"|format(item.change|float) }} 
+                        {% if item.change|float >= 0 %}+{% endif %}{{ ("%%.%df"|format(item.precision))|format(item.change|float) }} 
                         ({% if item.change_percent|float >= 0 %}+{% endif %}{{ item.change_percent }}%)
                     </span>
                 </div>
@@ -109,6 +164,7 @@
                             <option value="USD">USD - Amerikan Doları</option>
                             <option value="EUR">EUR - Euro</option>
                             <option value="GBP">GBP - İngiliz Sterlini</option>
+                            <option value="GRAM">GRAM - Gram Altın</option>
                             <option value="TRY" selected>TRY - Türk Lirası</option>
                         </select>
                     </div>
@@ -123,6 +179,7 @@
                             <option value="USD" selected>USD - Amerikan Doları</option>
                             <option value="EUR">EUR - Euro</option>
                             <option value="GBP">GBP - İngiliz Sterlini</option>
+                            <option value="GRAM">GRAM - Gram Altın</option>
                             <option value="TRY">TRY - Türk Lirası</option>
                         </select>
                     </div>
@@ -202,12 +259,14 @@
             const usdTry = currentRates['USDTRY=X'] || 1;
             const eurTry = currentRates['EURTRY=X'] || 1;
             const gbpTry = currentRates['GBPTRY=X'] || 1;
+            const gramTry = currentRates['XAUTRY=X'] || 1;
             
             const getRateToTry = (ccy) => {
                 if (ccy === 'TRY') return 1;
                 if (ccy === 'USD') return usdTry;
                 if (ccy === 'EUR') return eurTry;
                 if (ccy === 'GBP') return gbpTry;
+                if (ccy === 'GRAM') return gramTry;
                 return 1;
             };
 
@@ -243,12 +302,20 @@
         async function updateRates() {
             try {
                 const response = await fetch('/api/rates');
-                const data = await response.json();
+                const json = await response.json();
+                const data = json.rates;
+                const ticker = json.ticker;
                 
                 // Update internal rates
                 data.forEach(item => {
                     currentRates[item.symbol] = item.rate;
                 });
+
+                // Update last-updated timestamp
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString('tr-TR', { hour12: false });
+                const lastUpdatedEl = document.getElementById('last-updated-time');
+                if (lastUpdatedEl) lastUpdatedEl.innerText = timeStr;
                 
                 // Trigger conversion update
                 convert();
@@ -263,6 +330,7 @@
                     }, 600);
                 });
 
+                // Update analysis cards
                 data.forEach(item => {
                     const rateEl = document.getElementById(`rate-${item.symbol}`);
                     const badgeEl = document.getElementById(`badge-${item.symbol}`);
@@ -273,7 +341,8 @@
                         const newRate = parseFloat(item.rate);
                         
                         if (oldRate !== newRate) {
-                            rateEl.innerText = newRate.toFixed(4);
+                            const prec = item.precision || 4;
+                            rateEl.innerText = newRate.toFixed(prec);
                             
                             const cardEl = rateEl.closest('.glass-card') || rateEl;
                             cardEl.classList.remove('flash-up', 'flash-down');
@@ -282,9 +351,10 @@
 
                             
                             if (badgeEl) {
+                                const prec2 = item.precision || 4;
                                 const sign = item.change >= 0 ? '+' : '';
                                 const pctSign = item.change_percent >= 0 ? '+' : '';
-                                badgeEl.innerText = `${sign}${item.change.toFixed(4)} (${pctSign}${item.change_percent}%)`;
+                                badgeEl.innerText = `${sign}${item.change.toFixed(prec2)} (${pctSign}${item.change_percent}%)`;
                                 badgeEl.className = `rate-badge ${item.change >= 0 ? 'rate-up' : 'rate-down'}`;
                             }
                         }
@@ -292,6 +362,39 @@
 
                     if (timeEl) {
                         timeEl.innerText = item.update_time;
+                    }
+                });
+
+                // Update ticker table
+                ticker.forEach(t => {
+                    const row = document.getElementById(`ticker-${t.id}`);
+                    if (row) {
+                        const priceCell = row.querySelector('.ticker-price');
+                        const changeCell = row.querySelector('.ticker-change');
+                        const pctCell = row.querySelector('.ticker-pct');
+                        
+                        if (priceCell) {
+                            const prec = parseInt(priceCell.dataset.precision) || 2;
+                            const oldPrice = parseFloat(priceCell.innerText.replace(/[^0-9.-]/g, ''));
+                            const newPrice = parseFloat(t.rate);
+                            priceCell.innerText = t.currency_symbol + newPrice.toFixed(prec);
+                            if (oldPrice !== newPrice) {
+                                row.classList.remove('flash-up', 'flash-down');
+                                void row.offsetWidth;
+                                row.classList.add(newPrice > oldPrice ? 'flash-up' : 'flash-down');
+                            }
+                        }
+                        if (changeCell) {
+                            const sign = t.change >= 0 ? '+' : '';
+                            changeCell.innerText = `${sign}${t.change.toFixed(2)}`;
+                            changeCell.className = `ticker-change ${t.change >= 0 ? 'rate-up' : 'rate-down'}`;
+                        }
+                        if (pctCell) {
+                            const pctSign = t.change_percent >= 0 ? '+' : '';
+                            const dotClass = t.change_percent >= 0 ? 'dot-green' : 'dot-red';
+                            pctCell.innerHTML = `<span class="ticker-dot ${dotClass}"></span>${pctSign}${t.change_percent}%`;
+                            pctCell.className = `ticker-pct ${t.change_percent >= 0 ? 'rate-up' : 'rate-down'}`;
+                        }
                     }
                 });
             } catch (error) {
@@ -318,6 +421,11 @@
                 'hero_subtitle': 'Hatalara yer yok. En gelişmiş algoritmalarla döviz piyasasını 10 saniyede bir analiz ediyor, 2 yıllık projeksiyonlar sunuyoruz.',
                 'live_markets_title': 'Canlı Piyasalar',
                 'active_status': 'AKTİF',
+                'last_updated_label': 'Son Güncelleme:',
+                'detailed_analysis': 'Detaylı Analiz',
+                'ticker_th_product': 'Ürün',
+                'ticker_th_price': 'Fiyat',
+                'ticker_th_change': 'Değişim',
                 'analysis': 'Analiz <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem; margin-left: 4px;"></i>',
                 'converter_title': '<i class="fa-solid fa-calculator" style="margin-right: 10px; color: var(--accent-secondary);"></i> Hızlı Döviz Çevirici',
                 'converter_subtitle': 'Anlık Piyasa Verileriyle',
@@ -326,6 +434,7 @@
                 'label_target': 'Hedef',
                 'result_label': 'Tahmini İşlem Tutarı',
                 'name_USDTRY=X': 'Dolar', 'name_EURTRY=X': 'Euro', 'name_GBPTRY=X': 'Sterlin',
+                'name_GC=F': 'Ons Altın', 'name_SI=F': 'Gümüş', 'name_XAUTRY=X': 'Gram Altın',
                 'home_news_title': 'Son Finans Haberleri',
                 'home_news_all': 'Tümünü Gör',
                 'home_why_title': 'Neden GOBA Invest?',
@@ -352,6 +461,11 @@
                 'hero_subtitle': 'No room for errors. We analyze the forex market every 10 seconds with advanced algorithms and offer 2-year projections.',
                 'live_markets_title': 'Live Markets',
                 'active_status': 'ACTIVE',
+                'last_updated_label': 'Last Updated:',
+                'detailed_analysis': 'Detailed Analysis',
+                'ticker_th_product': 'Product',
+                'ticker_th_price': 'Price',
+                'ticker_th_change': 'Change',
                 'analysis': 'Analysis <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem; margin-left: 4px;"></i>',
                 'converter_title': '<i class="fa-solid fa-calculator" style="margin-right: 10px; color: var(--accent-secondary);"></i> Fast Currency Converter',
                 'converter_subtitle': 'With Real-Time Market Data',
@@ -360,6 +474,7 @@
                 'label_target': 'Target',
                 'result_label': 'Estimated Transaction Amount',
                 'name_USDTRY=X': 'Dollar', 'name_EURTRY=X': 'Euro', 'name_GBPTRY=X': 'Sterling',
+                'name_GC=F': 'Gold (Oz)', 'name_SI=F': 'Silver', 'name_XAUTRY=X': 'Gold (Gram)',
                 'home_news_title': 'Latest Finance News',
                 'home_news_all': 'See All',
                 'home_why_title': 'Why GOBA Invest?',
@@ -415,6 +530,13 @@
         const savedLang = localStorage.getItem('lang') || 'tr';
         console.log("Initializing Language:", savedLang);
         updateLanguage(savedLang);
+
+        // Set initial last-updated time from server-rendered page load
+        (function() {
+            const now = new Date();
+            const el = document.getElementById('last-updated-time');
+            if (el) el.innerText = now.toLocaleTimeString('tr-TR', { hour12: false });
+        })();
 
         // Live Clock logic
         function updateClock() {

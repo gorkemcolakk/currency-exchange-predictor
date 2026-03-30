@@ -244,8 +244,16 @@
         
         <div class="current-price-hero fade-in">
             <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 0.5rem;">
+                {% if info.flag == 'gold_ons' %}
+                <i class="fa-solid fa-coins" style="font-size: 1.8rem; color: #f59e0b;"></i>
+                {% elif info.flag == 'gold_gram' %}
+                <i class="fa-solid fa-scale-balanced" style="font-size: 1.8rem; color: #f59e0b;"></i>
+                {% elif info.flag == 'silver' %}
+                <i class="fa-solid fa-gem" style="font-size: 1.8rem; color: #94a3b8;"></i>
+                {% else %}
                 <img src="https://flagcdn.com/w40/{{ info.flag }}.png" style="width: 32px; border-radius: 4px;">
-                <span style="font-size: 1.25rem; font-weight: 500; color: var(--text-secondary);"><span data-i18n="live_status">Canlı</span> <span data-i18n="name_{{ info.name }}">{{ info.name }}</span> / TRY</span>
+                {% endif %}
+                <span style="font-size: 1.25rem; font-weight: 500; color: var(--text-secondary);"><span data-i18n="live_status">Canlı</span> <span data-i18n="name_{{ info.name }}">{{ info.name }}</span> / {{ info.quote }}</span>
             </div>
             <div style="display: flex; align-items: baseline; justify-content: center; gap: 1rem;">
                 <h2 style="font-size: 3.5rem; margin: 0;">{{ current_rate }}</h2>
@@ -264,7 +272,7 @@
                     <script>document.write(document.documentElement.getAttribute('lang') === 'en' ? "{{ forecasts[key].date_en }}" : "{{ forecasts[key].date_tr }}");</script>
                     <noscript>{{ forecasts[key].date_tr }}</noscript>
                 </span>
-                <span class="value">{{ forecasts[key].val }} TRY</span>
+                <span class="value">{{ forecasts[key].val }} {{ info.quote }}</span>
                 <span class="change {% if forecasts[key].change > 0 %}rate-up{% else %}rate-down{% endif %}">
                     {% if forecasts[key].change > 0 %}+{% endif %}{{ forecasts[key].change }}%
                 </span>
@@ -302,7 +310,7 @@
                     <thead>
                         <tr>
                             <th data-i18n="th_date"><i class="fa-regular fa-calendar" style="margin-right: 8px;"></i> Tarih</th>
-                            <th data-i18n="th_forecast"><i class="fa-solid fa-chart-simple" style="margin-right: 8px;"></i> Tahmin (TRY)</th>
+                            <th data-i18n="th_forecast"><i class="fa-solid fa-chart-simple" style="margin-right: 8px;"></i> Tahmin ({{ info.quote }})</th>
                             <th data-i18n="th_lower"><i class="fa-solid fa-arrow-down" style="margin-right: 8px;"></i> Alt Sınır</th>
                             <th data-i18n="th_upper"><i class="fa-solid fa-arrow-up" style="margin-right: 8px;"></i> Üst Sınır</th>
                         </tr>
@@ -311,9 +319,9 @@
                         {% for row in table_list %}
                         <tr>
                             <td class="td-date">{{ row.ds.strftime('%d.%m.%Y') if row.ds.strftime else row.ds[:10] }}</td>
-                            <td class="td-rate">{{ "%.4f"|format(row.yhat|float) }}</td>
-                            <td class="td-range">{{ "%.4f"|format(row.yhat_lower|float) }}</td>
-                            <td class="td-range">{{ "%.4f"|format(row.yhat_upper|float) }}</td>
+                            <td class="td-rate">{{ ("%%.%df"|format(precision))|format(row.yhat|float) }}</td>
+                            <td class="td-range">{{ ("%%.%df"|format(precision))|format(row.yhat_lower|float) }}</td>
+                            <td class="td-range">{{ ("%%.%df"|format(precision))|format(row.yhat_upper|float) }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -343,7 +351,8 @@
                         const newRate = parseFloat(item.rate);
                         
                         if (oldRate !== newRate) {
-                            priceEl.innerText = newRate.toFixed(4);
+                            const prec = {{ precision }};
+                            priceEl.innerText = newRate.toFixed(prec);
                             
                             const targetEl = priceEl.closest('.current-price-hero') || priceEl;
                             targetEl.classList.remove('flash-up', 'flash-down');
@@ -354,9 +363,10 @@
                     }
 
                     if (badgeEl) {
+                        const prec = {{ precision }};
                         const sign = item.change >= 0 ? '+' : '';
                         const pctSign = item.change_percent >= 0 ? '+' : '';
-                        badgeEl.innerText = `${sign}${item.change.toFixed(4)} (${pctSign}${item.change_percent}%)`;
+                        badgeEl.innerText = `${sign}${item.change.toFixed(prec)} (${pctSign}${item.change_percent}%)`;
                         badgeEl.className = `rate-badge ${item.change >= 0 ? 'rate-up' : 'rate-down'}`;
                     }
 
@@ -393,11 +403,12 @@
                 'last_update': 'Son Güncelleme',
                 'table_title': '<i class="fa-solid fa-table-list gradient-text"></i> Aylık Tahmin Listesi (2 Yıllık Projeksiyon)',
                 'th_date': '<i class="fa-regular fa-calendar" style="margin-right: 8px;"></i> Tarih',
-                'th_forecast': '<i class="fa-solid fa-chart-simple" style="margin-right: 8px;"></i> Tahmin (TRY)',
+                'th_forecast': '<i class="fa-solid fa-chart-simple" style="margin-right: 8px;"></i> Tahmin ({{ info.quote }})',
                 'th_lower': '<i class="fa-solid fa-arrow-down" style="margin-right: 8px;"></i> Alt Sınır',
                 'th_upper': '<i class="fa-solid fa-arrow-up" style="margin-right: 8px;"></i> Üst Sınır',
                 'label_1w': '1 Hafta', 'label_1m': '1 Ay', 'label_6m': '6 Ay', 'label_1y': '1 Yıl', 'label_2y': '2 Yıl',
-                'name_Dolar': 'Dolar', 'name_Euro': 'Euro', 'name_Sterlin': 'Sterlin'
+                'name_Dolar': 'Dolar', 'name_Euro': 'Euro', 'name_Sterlin': 'Sterlin',
+                'name_Ons Altın': 'Ons Altın', 'name_Gümüş': 'Gümüş', 'name_Gram Altın': 'Gram Altın'
             },
             'en': {
                 'nav_home': '<i class="fa-solid fa-house"></i> Home',
@@ -409,11 +420,12 @@
                 'last_update': 'Last Update',
                 'table_title': '<i class="fa-solid fa-table-list gradient-text"></i> Monthly Forecast List (2-Year Projection)',
                 'th_date': '<i class="fa-regular fa-calendar" style="margin-right: 8px;"></i> Date',
-                'th_forecast': '<i class="fa-solid fa-chart-simple" style="margin-right: 8px;"></i> Forecast (TRY)',
+                'th_forecast': '<i class="fa-solid fa-chart-simple" style="margin-right: 8px;"></i> Forecast ({{ info.quote }})',
                 'th_lower': '<i class="fa-solid fa-arrow-down" style="margin-right: 8px;"></i> Lower Bound',
                 'th_upper': '<i class="fa-solid fa-arrow-up" style="margin-right: 8px;"></i> Upper Bound',
                 'label_1w': '1 Week', 'label_1m': '1 Month', 'label_6m': '6 Months', 'label_1y': '1 Year', 'label_2y': '2 Years',
-                'name_Dolar': 'Dollar', 'name_Euro': 'Euro', 'name_Sterlin': 'Sterling'
+                'name_Dolar': 'Dollar', 'name_Euro': 'Euro', 'name_Sterlin': 'Sterling',
+                'name_Ons Altın': 'Gold (Oz)', 'name_Gümüş': 'Silver', 'name_Gram Altın': 'Gold (Gram)'
             }
         };
         const langToggle = document.getElementById('lang-toggle');

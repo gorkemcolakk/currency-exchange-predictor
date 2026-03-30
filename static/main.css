@@ -302,7 +302,7 @@ nav a:hover, nav a.active, nav a.nav-active {
 /* Bento Grid */
 .bento-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     grid-gap: 1.5rem;
     margin-bottom: 4rem;
     margin-top: 2rem;
@@ -409,23 +409,31 @@ nav a:hover, nav a.active, nav a.nav-active {
     transition: all 0.5s ease;
 }
 
-/* Flash Animations */
-@keyframes flash-green {
+/* ═══════════════════════════════════════════════════ */
+/*                 UNIFIED FLASH SYSTEM               */
+/* ═══════════════════════════════════════════════════ */
+@keyframes flash-green-long {
     0% { background-color: transparent; }
-    15% { background-color: rgba(16, 185, 129, 0.35); }
-    85% { background-color: rgba(16, 185, 129, 0.35); }
+    5% { background-color: rgba(16, 185, 129, 0.35); }
+    90% { background-color: rgba(16, 185, 129, 0.35); } /* Uzun süre yanık kalma */
     100% { background-color: transparent; }
 }
 
-@keyframes flash-red {
+@keyframes flash-red-long {
     0% { background-color: transparent; }
-    15% { background-color: rgba(239, 68, 68, 0.35); }
-    85% { background-color: rgba(239, 68, 68, 0.35); }
+    5% { background-color: rgba(239, 68, 68, 0.35); }
+    90% { background-color: rgba(239, 68, 68, 0.35); } /* Uzun süre yanık kalma */
     100% { background-color: transparent; }
 }
 
-.flash-up { animation: flash-green 1.5s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 12px; }
-.flash-down { animation: flash-red 1.5s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 12px; }
+.flash-up { 
+    animation: flash-green-long 4s cubic-bezier(0.4, 0, 0.2, 1) !important; 
+    border-radius: 12px; 
+}
+.flash-down { 
+    animation: flash-red-long 4s cubic-bezier(0.4, 0, 0.2, 1) !important; 
+    border-radius: 12px; 
+}
 
 
 /* Buttons */
@@ -483,13 +491,208 @@ footer {
     border-radius: 16px;
 }
 
+/* ═══════════════════════════════════════════════════ */
+/*               TICKER TABLE — PREMIUM               */
+/* ═══════════════════════════════════════════════════ */
+.ticker-table-section {
+    border-radius: 20px !important;
+    overflow: hidden;
+    border: 1px solid var(--card-border);
+}
+
+.ticker-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+}
+
+.ticker-table thead {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(16, 185, 129, 0.08) 100%);
+    border-bottom: 2px solid var(--card-border);
+}
+
+[data-theme='light'] .ticker-table thead {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.06) 0%, rgba(16, 185, 129, 0.06) 100%);
+}
+
+.ticker-table th {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    font-weight: 700;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--text-secondary);
+    position: relative;
+}
+
+.ticker-table th:first-child {
+    padding-left: 1.8rem;
+}
+
+.ticker-table td {
+    padding: 0.9rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    transition: all 0.25s ease;
+    vertical-align: middle;
+}
+
+.ticker-table td:first-child {
+    padding-left: 1.8rem;
+}
+
+[data-theme='light'] .ticker-table td {
+    border-bottom-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Alternating rows */
+.ticker-table tbody tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.015);
+}
+
+[data-theme='light'] .ticker-table tbody tr:nth-child(even) {
+    background: rgba(0, 0, 0, 0.015);
+}
+
+/* Hover effect */
+.ticker-table tbody tr {
+    transition: all 0.25s ease;
+    cursor: default;
+}
+
+.ticker-table tbody tr:hover {
+    background: rgba(59, 130, 246, 0.06);
+    transform: scale(1.002);
+}
+
+[data-theme='light'] .ticker-table tbody tr:hover {
+    background: rgba(59, 130, 246, 0.04);
+}
+
+/* Product name column */
+.ticker-name {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 600;
+    font-size: 0.92rem;
+}
+
+.ticker-name i {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    font-size: 0.85rem;
+}
+
+[data-theme='light'] .ticker-name i {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+/* Price column */
+.ticker-price {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    letter-spacing: -0.3px;
+}
+
+/* Change columns */
+.ticker-change, .ticker-pct {
+    font-weight: 600;
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+/* Status dot with intense neon glow */
+.ticker-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 10px;
+    vertical-align: middle;
+    position: relative;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.dot-green {
+    background: #10b981;
+    box-shadow: 0 0 8px #10b981, 0 0 12px rgba(16, 185, 129, 0.5);
+    animation: neonGreen 4s infinite alternate;
+}
+
+.dot-red {
+    background: #ef4444;
+    box-shadow: 0 0 8px #ef4444, 0 0 12px rgba(239, 68, 68, 0.5);
+    animation: neonRed 4s infinite alternate;
+}
+
+@keyframes neonGreen {
+    from { box-shadow: 0 0 5px #10b981, 0 0 12px #10b981; opacity: 1; }
+    to { box-shadow: 0 0 15px #10b981, 0 0 25px #10b981; opacity: 0.9; }
+}
+
+@keyframes neonRed {
+    from { box-shadow: 0 0 5px #ef4444, 0 0 12px #ef4444; opacity: 1; }
+    to { box-shadow: 0 0 15px #ef4444, 0 0 25px #ef4444; opacity: 0.9; }
+}
+
+/* Ticker Flash - Handled by UNIFIED FLASH SYSTEM */
+
+/* ═══════════════════════════════════════════════════ */
+/*             ANALYSIS GRID — 3 COLUMNS              */
+/* ═══════════════════════════════════════════════════ */
+.analysis-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 1.5rem !important;
+}
+
+.analysis-grid .rate-value {
+    font-size: 2.2rem;
+}
+
 /* Responsive */
+@media (max-width: 1024px) {
+    .bento-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .analysis-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
 @media (max-width: 768px) {
     .bento-grid {
         grid-template-columns: 1fr;
     }
+    .analysis-grid {
+        grid-template-columns: 1fr !important;
+    }
     .hero h1 {
         font-size: 2.5rem;
+    }
+    .ticker-table th, .ticker-table td {
+        padding: 0.7rem 0.8rem;
+        font-size: 0.8rem;
+    }
+    .ticker-table th:first-child,
+    .ticker-table td:first-child {
+        padding-left: 0.8rem;
+    }
+    .ticker-name i {
+        width: 26px;
+        height: 26px;
+        font-size: 0.7rem;
+    }
+    .ticker-price {
+        font-size: 0.9rem;
     }
 }
 /* Converter Section */

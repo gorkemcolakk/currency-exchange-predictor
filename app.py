@@ -11,10 +11,21 @@ app = Flask(__name__)
 
 # Supported Currencies Settings
 SUPPORTED_CURRENCIES = {
-    "USDTRY=X": {"name": "Dolar", "flag": "us", "symbol": "$"},
-    "EURTRY=X": {"name": "Euro", "flag": "eu", "symbol": "€"},
-    "GBPTRY=X": {"name": "Sterlin", "flag": "gb", "symbol": "£"},
+    "USDTRY=X": {"name": "Dolar", "flag": "us", "symbol": "₺", "base": "USD", "quote": "TRY", "precision": 4},
+    "EURTRY=X": {"name": "Euro", "flag": "eu", "symbol": "₺", "base": "EUR", "quote": "TRY", "precision": 4},
+    "GBPTRY=X": {"name": "Sterlin", "flag": "gb", "symbol": "₺", "base": "GBP", "quote": "TRY", "precision": 4},
+    "GC=F":     {"name": "Ons Altın", "flag": "gold_ons", "symbol": "$", "base": "XAU", "quote": "USD", "precision": 2},
+    "SI=F":     {"name": "Gümüş", "flag": "silver", "symbol": "$", "base": "XAG", "quote": "USD", "precision": 2},
+    "XAUTRY=X": {"name": "Gram Altın", "flag": "gold_gram", "symbol": "₺", "base": "XAU", "quote": "TRY", "precision": 2},
 }
+
+# Türev Altın Ürünleri (Gram Altın üzerinden hesaplanır)
+GOLD_DERIVED = [
+    {"id": "ceyrek",     "name": "Çeyrek Altın",     "name_en": "Quarter Gold",    "multiplier": 1.75,  "icon": "fa-ring"},
+    {"id": "yarim",      "name": "Yarım Altın",      "name_en": "Half Gold",       "multiplier": 3.51,  "icon": "fa-circle-half-stroke"},
+    {"id": "tam",        "name": "Tam Altın",        "name_en": "Full Gold",       "multiplier": 7.02,  "icon": "fa-circle"},
+    {"id": "cumhuriyet", "name": "Cumhuriyet Altın", "name_en": "Republic Gold",   "multiplier": 7.216, "icon": "fa-star"},
+]
 
 # Cache Settings
 CACHE_DIR = "static/cache"
@@ -22,22 +33,75 @@ if not os.path.exists(CACHE_DIR):
     os.makedirs(CACHE_DIR, exist_ok=True)
 
 def get_current_data_all():
-    """Tüm güncel kur verilerini Yahoo üzerinden çeker (Tam tutarlılık için)."""
+    """Tüm güncel kur verilerini Yahoo üzerinden çeker."""
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
     }
     data = []
+    
+    # Önce USD/TRY kurunu çek (gram altın hesaplaması için gerekli)
+    usd_try_rate = 1.0
+    try:
+        url = "https://query2.finance.yahoo.com/v8/finance/chart/USDTRY=X?range=1d&interval=1m"
+        res = requests.get(url, headers=headers, timeout=5).json()
+        usd_try_rate = res['chart']['result'][0]['meta']['regularMarketPrice']
+    except Exception as e:
+        print(f"USD/TRY rate fetch error: {e}")
+    
+    # Altın ons verisini bir kez çek (hem Ons hem Gram için)
+    gold_usd = 0.0
+    gold_prev_usd = 0.0
+    try:
+        gold_url = "https://query2.finance.yahoo.com/v8/finance/chart/GC=F?range=1d&interval=1m"
+        gold_res = requests.get(gold_url, headers=headers, timeout=5).json()
+        gold_meta = gold_res['chart']['result'][0]['meta']
+        gold_usd = gold_meta['regularMarketPrice']
+        gold_prev_usd = gold_meta.get('previousClose', gold_usd)
+    except Exception as e:
+        print(f"Gold (GC=F) fetch error: {e}")
+    
+    # Gümüş verisini bir kez çek
+    silver_usd = 0.0
+    silver_prev_usd = 0.0
+    try:
+        silver_url = "https://query2.finance.yahoo.com/v8/finance/chart/SI=F?range=1d&interval=1m"
+        silver_res = requests.get(silver_url, headers=headers, timeout=5).json()
+        silver_meta = silver_res['chart']['result'][0]['meta']
+        silver_usd = silver_meta['regularMarketPrice']
+        silver_prev_usd = silver_meta.get('previousClose', silver_usd)
+    except Exception as e:
+        print(f"Silver (SI=F) fetch error: {e}")
+    
     for symbol, info in SUPPORTED_CURRENCIES.items():
-        base = symbol[:3].upper()
+        precision = info['precision']
         try:
-            # 1 günlük veriyi 1 dakikalık aralıkla çekerek en son kur değerini alıyoruz
-            url = f"https://query2.finance.yahoo.com/v8/finance/chart/{symbol}?range=1d&interval=1m"
-            res = requests.get(url, headers=headers, timeout=5).json()
-            meta = res['chart']['result'][0]['meta']
-            rate_val = meta['regularMarketPrice']
-            prev_close = meta.get('previousClose', rate_val)
-            change = rate_val - prev_close
-            change_percent = (change / prev_close) * 100 if prev_close != 0 else 0
+            if symbol == 'GC=F':
+                # Ons Altın: Direkt USD cinsinden
+                rate_val = gold_usd
+                prev_val = gold_prev_usd
+                change = rate_val - prev_val
+                change_percent = (change / prev_val) * 100 if prev_val != 0 else 0
+            elif symbol == 'SI=F':
+                # Gümüş: Direkt USD cinsinden
+                rate_val = silver_usd
+                prev_val = silver_prev_usd
+                change = rate_val - prev_val
+                change_percent = (change / prev_val) * 100 if prev_val != 0 else 0
+            elif symbol == 'XAUTRY=X':
+                # Gram Altın: (Ons USD * USD/TRY) / 31.1035
+                rate_val = (gold_usd * usd_try_rate) / 31.1035
+                prev_val = (gold_prev_usd * usd_try_rate) / 31.1035
+                change = rate_val - prev_val
+                change_percent = (change / prev_val) * 100 if prev_val != 0 else 0
+            else:
+                # Normal döviz kurları
+                url = f"https://query2.finance.yahoo.com/v8/finance/chart/{symbol}?range=1d&interval=1m"
+                res = requests.get(url, headers=headers, timeout=5).json()
+                meta = res['chart']['result'][0]['meta']
+                rate_val = meta['regularMarketPrice']
+                prev_close = meta.get('previousClose', rate_val)
+                change = rate_val - prev_close
+                change_percent = (change / prev_close) * 100 if prev_close != 0 else 0
         except Exception as e:
             print(f"Yahoo live rate error for {symbol}: {e}")
             rate_val = 0.0
@@ -46,40 +110,96 @@ def get_current_data_all():
             
         data.append({
             "symbol": symbol,
-            "base": base,
+            "base": info['base'],
+            "quote": info['quote'],
             "name": info["name"],
-            "rate": round(rate_val, 4),
-            "change": round(change, 4),
+            "rate": round(rate_val, precision),
+            "change": round(change, precision),
             "change_percent": round(change_percent, 2),
             "flag": info["flag"],
             "currency_symbol": info["symbol"],
-            "update_time": datetime.now().strftime('%H:%M:%S')
+            "update_time": datetime.now().strftime('%H:%M:%S'),
+            "precision": precision
         })
     return data
 
 def train_and_forecast(currency_symbol, periods=730):
     """Borsa verilerini çekerek gelişmiş Prophet tahmini üretir."""
     try:
-        # 1. Veri Çekme (query2.finance.yahoo.com üzerinden direkt requests ile)
-        # yfinance bazen rate limit yiyebiliyor, direkt requests daha sağlam.
-        url = f"https://query2.finance.yahoo.com/v8/finance/chart/{currency_symbol}?range=5y&interval=1d"
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
         }
-        res = requests.get(url, headers=headers, timeout=15).json()
         
-        if 'chart' not in res or res['chart']['result'] is None:
-            print(f"Yahoo API Error: {res}")
-            return None
+        if currency_symbol in ('GC=F', 'SI=F'):
+            # Emtia: Direkt futures (USD) verisini kullan
+            emtia_url = f"https://query2.finance.yahoo.com/v8/finance/chart/{currency_symbol}?range=5y&interval=1d"
+            emtia_res = requests.get(emtia_url, headers=headers, timeout=15).json()
             
-        result_data = res['chart']['result'][0]
-        timestamps = result_data['timestamp']
-        closes = result_data['indicators']['quote'][0]['close']
-        
-        df = pd.DataFrame({
-            'ds': [datetime.fromtimestamp(t) for t in timestamps], 
-            'y': closes
-        }).dropna()
+            if 'chart' not in emtia_res or emtia_res['chart']['result'] is None:
+                print(f"Yahoo API Error ({currency_symbol}): {emtia_res}")
+                return None
+            
+            emtia_data = emtia_res['chart']['result'][0]
+            emtia_ts = emtia_data['timestamp']
+            emtia_closes = emtia_data['indicators']['quote'][0]['close']
+            
+            df = pd.DataFrame({
+                'ds': [datetime.fromtimestamp(t) for t in emtia_ts],
+                'y': emtia_closes
+            }).dropna()
+        elif currency_symbol == 'XAUTRY=X':
+            # Gram Altın: GC=F (USD) ve USDTRY=X verilerini çek, (Ons * USDTRY) / 31.1035
+            gold_url = "https://query2.finance.yahoo.com/v8/finance/chart/GC=F?range=5y&interval=1d"
+            usd_url = "https://query2.finance.yahoo.com/v8/finance/chart/USDTRY=X?range=5y&interval=1d"
+            
+            gold_res = requests.get(gold_url, headers=headers, timeout=15).json()
+            usd_res = requests.get(usd_url, headers=headers, timeout=15).json()
+            
+            if 'chart' not in gold_res or gold_res['chart']['result'] is None:
+                print(f"Yahoo API Error (GC=F): {gold_res}")
+                return None
+            if 'chart' not in usd_res or usd_res['chart']['result'] is None:
+                print(f"Yahoo API Error (USDTRY): {usd_res}")
+                return None
+            
+            gold_data = gold_res['chart']['result'][0]
+            usd_data = usd_res['chart']['result'][0]
+            
+            gold_ts = gold_data['timestamp']
+            gold_closes = gold_data['indicators']['quote'][0]['close']
+            usd_ts = usd_data['timestamp']
+            usd_closes = usd_data['indicators']['quote'][0]['close']
+            
+            df_gold = pd.DataFrame({
+                'ds': [datetime.fromtimestamp(t).date() for t in gold_ts],
+                'gold_usd': gold_closes
+            }).dropna()
+            df_usd = pd.DataFrame({
+                'ds': [datetime.fromtimestamp(t).date() for t in usd_ts],
+                'usd_try': usd_closes
+            }).dropna()
+            
+            df = pd.merge(df_gold, df_usd, on='ds', how='inner')
+            df['y'] = (df['gold_usd'] * df['usd_try']) / 31.1035
+            df['ds'] = pd.to_datetime(df['ds'])
+            df = df[['ds', 'y']].dropna()
+        else:
+            # Normal döviz kurları
+            url = f"https://query2.finance.yahoo.com/v8/finance/chart/{currency_symbol}?range=5y&interval=1d"
+            res = requests.get(url, headers=headers, timeout=15).json()
+            
+            if 'chart' not in res or res['chart']['result'] is None:
+                print(f"Yahoo API Error: {res}")
+                return None
+                
+            result_data = res['chart']['result'][0]
+            timestamps = result_data['timestamp']
+            closes = result_data['indicators']['quote'][0]['close']
+            
+            df = pd.DataFrame({
+                'ds': [datetime.fromtimestamp(t) for t in timestamps], 
+                'y': closes
+            }).dropna()
         
         if df.empty:
             return None
@@ -179,6 +299,67 @@ def train_and_forecast(currency_symbol, periods=730):
         print(f"Forecast error for {currency_symbol}: {e}")
         return None
 
+def get_ticker_data(forex_data):
+    """Forex verisinden türev altın/gümüş ürünlerini hesaplayıp geniş ticker listesi oluşturur."""
+    ticker = []
+    gram_item = None
+    silver_item = None
+    usd_try_item = None
+    
+    for item in forex_data:
+        ticker.append({
+            "id": item["symbol"].replace("=", ""),
+            "name": item["name"],
+            "rate": item["rate"],
+            "change": item["change"],
+            "change_percent": item["change_percent"],
+            "precision": item["precision"],
+            "currency_symbol": item["currency_symbol"],
+            "icon": "fa-dollar-sign" if item["symbol"] == "USDTRY=X" else "fa-euro-sign" if item["symbol"] == "EURTRY=X" else "fa-sterling-sign" if item["symbol"] == "GBPTRY=X" else "fa-coins" if item["flag"] == "gold_ons" else "fa-gem" if item["flag"] == "silver" else "fa-scale-balanced",
+        })
+        if item["symbol"] == "XAUTRY=X":
+            gram_item = item
+        if item["symbol"] == "SI=F":
+            silver_item = item
+        if item["symbol"] == "USDTRY=X":
+            usd_try_item = item
+    
+    # Türev altın ürünlerini ekle
+    if gram_item:
+        for gold in GOLD_DERIVED:
+            derived_rate = round(gram_item["rate"] * gold["multiplier"], 2)
+            derived_change = round(gram_item["change"] * gold["multiplier"], 2)
+            ticker.append({
+                "id": gold["id"],
+                "name": gold["name"],
+                "name_en": gold["name_en"],
+                "rate": derived_rate,
+                "change": derived_change,
+                "change_percent": gram_item["change_percent"],
+                "precision": 2,
+                "currency_symbol": "₺",
+                "icon": gold["icon"],
+            })
+    
+    # Gram Gümüş: (Ons Gümüş USD * USD/TRY) / 31.1035
+    if silver_item and usd_try_item:
+        usd_try_rate = usd_try_item["rate"]
+        gram_silver_rate = round((silver_item["rate"] * usd_try_rate) / 31.1035, 2)
+        gram_silver_change = round((silver_item["change"] * usd_try_rate) / 31.1035, 2)
+        ticker.append({
+            "id": "gram_gumus",
+            "name": "Gram Gümüş",
+            "name_en": "Gram Silver",
+            "rate": gram_silver_rate,
+            "change": gram_silver_change,
+            "change_percent": silver_item["change_percent"],
+            "precision": 2,
+            "currency_symbol": "₺",
+            "icon": "fa-gem",
+        })
+    
+    return ticker
+
 @app.route('/')
 def index():
     try:
@@ -186,7 +367,9 @@ def index():
     except Exception as e:
         print(f"Error in index: {e}")
         forex_data = []
-    return render_template('index.html', forex_data=forex_data)
+    
+    ticker_data = get_ticker_data(forex_data)
+    return render_template('index.html', forex_data=forex_data, ticker_data=ticker_data)
 
 @app.route('/currency/<symbol>')
 def currency_page(symbol):
@@ -253,8 +436,9 @@ def currency_page(symbol):
         for en, tr in months.items():
             date_tr = date_tr.replace(en, tr)
             
+        precision = info.get('precision', 4)
         change = ((val - current_rate) / current_rate) * 100 if current_rate != 0 else 0
-        return {"val": round(val, 4), "change": round(change, 2), "date_tr": date_tr, "date_en": date_en}
+        return {"val": round(val, precision), "change": round(change, 2), "date_tr": date_tr, "date_en": date_en}
 
     forecasts = {
         "1w": get_forecast_val(7),
@@ -280,22 +464,30 @@ def currency_page(symbol):
     plot_file_en = f"cache/{safe_name}_plot_en.html"
     plot_exists = os.path.exists(os.path.join(CACHE_DIR, f"{safe_name}_plot_tr.html"))
 
+    precision = info.get('precision', 4)
+    fmt_rate = f"{current_rate:.{precision}f}"
+    fmt_change = f"{change_val:+.{precision}f}"
+    fmt_pct = f"{change_pct:+.2f}"
+
     return render_template('currency.html', 
                          info=info, 
                          symbol=symbol,
-                         current_rate=f"{current_rate:.4f}",
-                         change_val=f"{change_val:+.4f}",
-                         change_pct=f"{change_pct:+.2f}",
+                         current_rate=fmt_rate,
+                         change_val=fmt_change,
+                         change_pct=fmt_pct,
                          forecasts=forecasts,
                          table_list=table_list,
                          plot_file_tr=plot_file_tr,
                          plot_file_en=plot_file_en,
                          plot_exists=plot_exists,
+                         precision=precision,
                          update_time=current_item['update_time'] if current_item else datetime.now().strftime('%H:%M:%S'))
 
 @app.route('/api/rates')
 def api_rates():
-    return jsonify(get_current_data_all())
+    forex_data = get_current_data_all()
+    ticker_data = get_ticker_data(forex_data)
+    return jsonify({"rates": forex_data, "ticker": ticker_data})
 
 @app.route('/news')
 def news():
