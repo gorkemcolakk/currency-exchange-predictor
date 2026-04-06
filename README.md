@@ -35,10 +35,30 @@
 - **İkonlar:** FontAwesome 6
 
 
+
 ---
 
+## 📸 Ekran Görüntüleri
 
+<div align="center">
+  <h3>📊 Detaylı Analiz Paneli</h3>
+  <img src="docs/img/dashboard.png" alt="Dashboard" width="800">
+  <p><em>Piyasa verilerinin görselleştirildiği premium kart tasarımı.</em></p>
+  
+  <br>
 
+  <h3>💱 Hızlı Çevirici ve Haberler</h3>
+  <img src="docs/img/converter.png" alt="Converter" width="800">
+  <p><em>Anlık kurlar üzerinden çalışan hesap makinesi ve finans haberleri.</em></p>
+
+  <br>
+
+  <h3>📈 Yapay Zeka Tahmin Grafiği</h3>
+  <img src="docs/img/analysis.png" alt="Analysis" width="800">
+  <p><em>Prophet algoritması ile oluşturulan 2 yıllık trend analizi.</em></p>
+</div>
+
+---
 ## 📄 Lisans
 
 Bu proje MIT Lisansı ile lisanslanmıştır. Daha fazla bilgi için `LICENSE` dosyasına göz atabilirsiniz.
