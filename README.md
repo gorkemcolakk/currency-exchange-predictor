@@ -34,51 +34,10 @@
 - **Görselleştirme:** Plotly.js
 - **İkonlar:** FontAwesome 6
 
----
-
-## 📸 Ekran Görüntüleri
-
-<div align="center">
-  <img src="https://via.placeholder.com/800x450?text=Dashboard+Overview" alt="Dashboard" width="800">
-  <p><em>Modern ve Kullanıcı Dostu Dashboard Arayüzü</em></p>
-  <img src="https://via.placeholder.com/800x450?text=AI+Forecast+Charts" alt="Analytics" width="800">
-  <p><em>Yapay Zeka Destekli Tahmin Grafikleri</em></p>
-</div>
 
 ---
 
-## ⚙️ Kurulum ve Çalıştırma
 
-Projenizi yerel ortamınızda çalıştırmak için aşağıdaki adımları izleyin:
-
-1. **Depoyu klonlayın:**
-   ```bash
-   git clone https://github.com/gorkemcolakk/currency-exchange-predictor.git
-   cd currency-exchange-predictor
-   ```
-
-2. **Gerekli kütüphaneleri kurun:**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. **Uygulamayı başlatın:**
-   ```bash
-   python app.py
-   ```
-   *Uygulama varsayılan olarak `http://127.0.0.1:5000` adresinde çalışacaktır.*
-
----
-
-## 🧠 Nasıl Çalışır?
-
-GOBA INVEST, Yahoo Finance üzerinden son 5 yıllık geçmiş verileri çeker. Bu veriler üzerinde:
-1. **Veri Temizliği:** Eksik ve hatalı veriler Pandas ile optimize edilir.
-2. **Model Eğitimi:** Prophet modeli; yıllık mevsimsellik, Türkiye tatil takvimi ve trend değişim noktaları (changepoints) hesaba katılarak eğitilir.
-3. **Tahmin:** Eğitilen model, gelecek 730 gün için tahmin aralıklarını (yhat, yhat_lower, yhat_upper) hesaplar.
-4. **Görselleştirme:** Elde edilen veriler Plotly ile kullanıcıya interaktif bir şekilde sunulur.
-
----
 
 ## 📄 Lisans
 
