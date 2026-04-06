@@ -47,6 +47,12 @@
   
   <br>
 
+  <h3>📋 Canlı Piyasalar Tablosu</h3>
+  <img src="docs/img/live_market.png" alt="Live Markets" width="800">
+  <p><em>USD, EUR, GBP ve Altın/Gümüş ürünlerinin anlık takibi.</em></p>
+
+  <br>
+
   <h3>💱 Hızlı Çevirici ve Haberler</h3>
   <img src="docs/img/converter.png" alt="Converter" width="800">
   <p><em>Anlık kurlar üzerinden çalışan hesap makinesi ve finans haberleri.</em></p>
