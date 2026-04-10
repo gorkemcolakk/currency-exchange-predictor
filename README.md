@@ -65,12 +65,40 @@
 </div>
 
 ---
-## 📄 Lisans
 
-Bu proje MIT Lisansı ile lisanslanmıştır. Daha fazla bilgi için `LICENSE` dosyasına göz atabilirsiniz.
+## 📂 Proje Yapısı
+
+```text
+├── app.py              # Ana Flask uygulama sunucusu ve AI modelleri
+├── requirements.txt    # Gerekli kütüphanelerin listesi
+├── static/
+│   ├── css/            # Stil dosyaları
+│   ├── js/             # Frontend mantığı ve AJAX güncellemeleri
+│   └── docs/img/       # README görselleri
+├── templates/          # HTML arayüz dosyaları
+└── docs/               # Teknik dokümantasyon (ekran görüntüleri vb.)
+```
 
 ---
 
+## 🔌 API Referansı
+
+Platform, dış entegrasyonlar için temel bir API sunmaktadır:
+
+| Endpoint | Metot | Açıklama |
+| :--- | :--- | :--- |
+| `/api/rates` | `GET` | Tüm canlı döviz ve altın kurlarını JSON formatında döner. |
+
+---
+
+## 🗺️ Yol Haritası
+
+- [ ] 📱 **Mobil Uygulama:** Flutter veya React Native ile mobil destek.
+- [ ] 🔔 **Fiyat Alarmları:** Belirli bir kur seviyesine ulaşıldığında e-posta/push bildirimi.
+- [ ] 💹 **Portföy Yönetimi:** Kullanıcıların kendi varlıklarını takip edebileceği bir panel.
+- [ ] 🤖 **Daha Fazla Model:** LSTM ve ARIMA gibi farklı AI modelleri ile hibrit tahminleme.
+
+---
 ## 📧 İletişim
 
 **Eren Görkem Çolak** - [GitHub](https://github.com/gorkemcolakk) - [LinkedIn](https://www.linkedin.com/in/eren-g%C3%B6rkem-%C3%A7olak-06104b35a/)
