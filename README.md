@@ -91,12 +91,12 @@ Platform, dış entegrasyonlar için temel bir API sunmaktadır:
 
 ---
 
-## 🗺️ Yol Haritası
+## ⚙️ Öne Çıkan Teknik Özellikler
 
-- [ ] 📱 **Mobil Uygulama:** Flutter veya React Native ile mobil destek.
-- [ ] 🔔 **Fiyat Alarmları:** Belirli bir kur seviyesine ulaşıldığında e-posta/push bildirimi.
-- [ ] 💹 **Portföy Yönetimi:** Kullanıcıların kendi varlıklarını takip edebileceği bir panel.
-- [ ] 🤖 **Daha Fazla Model:** LSTM ve ARIMA gibi farklı AI modelleri ile hibrit tahminleme.
+- **Akıllı Önbellekleme (Caching):** Model eğitimi ve grafik oluşturma süreçleri maliyetli olduğu için, üretilen veriler 2 saatlik periyotlarla yerel olarak saklanır. Bu sayede her sayfaya girişte modelin tekrar eğitilmesi önlenerek yüksek performans sağlanır.
+- **Gerçek Zamanlı Veri Senkronizasyonu:** AJAX teknolojisi kullanılarak sayfa yenilenmeden veriler her 10 saniyede bir güncellenir. "Jitter" algoritması ile sunucu yükü dengelenir.
+- **Dinamik Görselleştirme:** Her sembol için özelleştirilmiş analiz sayfalarında, Plotly üzerinden interaktif (zoom, pan, hover destekli) teknik grafikler sunulur.
+- **Haber Akışı ve İletişim:** Entegre haber modülü ve başarı geri bildirimli iletişim formu ile statik bir araçtan ziyade yaşayan bir platform yapısı sunulur.
 
 ---
 ## 📧 İletişim
